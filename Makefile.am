@@ -13,10 +13,19 @@ AM_CPPFLAGS =					\
 bin_PROGRAMS =					\
 	pipe-reader				\
 	pipe-writer				\
+	dls					\
+	dpwd					\
+	dresolve				\
 	$(NULL)
 
 pipe_reader_SOURCES = pipe-reader.c pipeneg.c
 pipe_writer_SOURCES = pipe-writer.c pipeneg.c
+dls_SOURCES = dls.c dtools.c
+dls_LDADD = $(GIO_LIBS)
+dpwd_SOURCES = dpwd.c dtools.c
+dpwd_LDADD = $(GIO_LIBS)
+dresolve_SOURCES = dresolve.c dtools.c
+dresolve_LDADD = $(GIO_LIBS)
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \

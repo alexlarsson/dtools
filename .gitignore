@@ -18,3 +18,10 @@ pipe-writer
 pipe-writer.o
 pipeneg.o
 stamp-h1
+dls
+dls.o
+dpwd
+dpwd.o
+dresolve
+dresolve.o
+dtools.o
