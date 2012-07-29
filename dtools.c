@@ -17,7 +17,7 @@ char *
 dtools_get_bus (const char *path, const char **rest)
 {
   const char *start, *p;
-  
+
   g_return_val_if_fail (path != NULL, NULL);
   g_return_val_if_fail (dtools_path_is_full (path), NULL);
 
@@ -63,7 +63,7 @@ canonicalize (const char *path)
     if (*path != 0) {
       /* And its not empty */
       element = path;
-      
+
       while (*path != 0 && *path != '/') {
 	path++;
       }
@@ -89,7 +89,7 @@ canonicalize (const char *path)
       }
     }
   }
-  
+
   return g_string_free (s, FALSE);
 }
 
@@ -134,4 +134,69 @@ dtools_get_cwd (void)
     return dtools_resolve_path ("//session", path);
 
   return g_strdup ("//session");
+}
+
+
+GBusType
+dtools_get_bus_type (const char *bus)
+{
+  while (*bus == '/')
+    bus++;
+
+  if (strcmp (bus, "session") == 0)
+    return G_BUS_TYPE_SESSION;
+  if (strcmp (bus, "system") == 0)
+    return G_BUS_TYPE_SYSTEM;
+
+  return G_BUS_TYPE_NONE;
+}
+
+gboolean
+dtools_path_disassemble (const char *path,
+			 GDBusConnection **connection,
+			 char **name,
+			 char **objpath,
+			 char **interface,
+			 GError **error)
+{
+  const char *rest, *s, *last;
+  char *bus;
+  GBusType type;
+
+  bus = dtools_get_bus (path, &rest);
+  type = dtools_get_bus_type (bus);
+  g_free (bus);
+
+  *connection = g_bus_get_sync (type, NULL, error);
+  if (*connection == NULL)
+    return FALSE;
+
+  *name = NULL;
+  *objpath = NULL;
+  *interface = NULL;
+
+  if (*rest != 0)
+    {
+      while (*rest == '/')
+	rest++;
+      s = rest;
+      while (*rest != 0 && *rest != '/')
+	rest++;
+      *name = g_strndup (s, rest - s);
+
+      if (*rest != 0)
+	{
+	  last = strrchr (rest, '/');
+	  if (last != NULL && strchr (last, '.') != NULL)
+	    {
+	      *interface = g_strdup (last + 1);
+	      *objpath = g_strndup (rest, last - rest);
+	    }
+	  else
+	    *objpath = g_strdup (rest);
+	}
+      else
+	*objpath = g_strdup ("/");
+    }
+  return TRUE;
 }
