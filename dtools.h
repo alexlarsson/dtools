@@ -1,6 +1,7 @@
 #include <gio/gio.h>
 
 #include "variant-writer.h"
+#include "variant-reader.h"
 
 char *dtools_get_cwd (void);
 char *dtools_resolve_path (const char *base, const char *path);

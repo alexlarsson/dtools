@@ -28,3 +28,7 @@ dtools.o
 decho
 decho.o
 variant-writer.o
+dcat
+dcat.c
+dcat.o
+variant-reader.o
