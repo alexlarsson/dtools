@@ -25,3 +25,6 @@ dpwd.o
 dresolve
 dresolve.o
 dtools.o
+decho
+decho.o
+variant-writer.o
