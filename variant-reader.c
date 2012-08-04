@@ -142,6 +142,54 @@ read_variant (gchar *_ptr, gsize len, gsize *size_out)
   return NULL;
 }
 
+static const char *
+find_variant_end (const char *str, gsize len)
+{
+  int var_depth;
+  char in_string;
+  const char *end = str + len;
+  const char *p;
+
+  in_string = 0;
+  var_depth = 0;
+  for (p = str; p < end; p++)
+    {
+      char c = *p;
+
+      if (in_string)
+	{
+	  if (c == '\\' && p + 1 < end)
+	    {
+	      p++;
+	      c = *p;
+	    }
+	  else if (c == '"' && in_string == '"')
+	    in_string = 0;
+	  else if (c == '\'' && in_string == '\'')
+	    in_string = 0;
+	}
+      else
+	{
+	  if (c == '<')
+	    {
+	      var_depth++;
+	    }
+	  else if (c == '>')
+	    {
+	      var_depth--;
+	      if (var_depth == 0)
+		return p;
+	    }
+	  else if (c == '"')
+	    in_string = '"';
+	  else if (c == '\'')
+	    in_string = '\'';
+	}
+    }
+
+  return NULL;
+}
+
 GVariant *
 dtools_variant_reader_next (DtoolsVariantReader *reader)
 {
@@ -219,7 +267,67 @@ dtools_variant_reader_next (DtoolsVariantReader *reader)
     }
   else
     {
-      g_error ("text");
+      GVariant *v, *tmp;
+      const char *endptr;
+      GError *error;
+      gsize v_size;
+      int start;
+
+      while (TRUE)
+	{
+	  start = 0;
+	  while (start < reader->buffer->len)
+	    {
+	      if (reader->buffer->str[start] == '<')
+		break;
+	      start++;
+	    }
+	  if (start == reader->buffer->len)
+	    {
+	      g_string_set_size (reader->buffer, 0);
+	      if (!read_some (reader))
+		return NULL;
+	    }
+	  else
+	    break;
+	}
+
+      while (!find_variant_end (reader->buffer->str + start, reader->buffer->len - start))
+	{
+	  if (!read_some (reader))
+	    return NULL;
+	}
+
+      error = NULL;
+      v = g_variant_parse (G_VARIANT_TYPE_VARIANT,
+			   reader->buffer->str + start,
+			   reader->buffer->str + reader->buffer->len,
+			   &endptr, &error);
+
+      if (v != NULL)
+	{
+	  tmp = g_variant_get_child_value (v, 0);
+	  g_variant_unref (v);
+	  v = tmp;
+	}
+      else
+	{
+	  v = g_variant_new_maybe (G_VARIANT_TYPE_STRING, NULL);
+	  endptr = find_variant_end (reader->buffer->str + start,
+				     reader->buffer->len - start) + 1;
+	  g_warning ("Variant parse error: %s\n", error->message);
+	  g_error_free (error);
+	}
+
+      v_size = endptr - reader->buffer->str;
+
+      /* TODO: This is not very efficient, as it copies a lot */
+      memmove (reader->buffer->str,
+	       reader->buffer->str + v_size,
+	       reader->buffer->len - v_size);
+      g_string_set_size (reader->buffer,
+			 reader->buffer->len - v_size);
+      return v;
     }
     
   return NULL;
