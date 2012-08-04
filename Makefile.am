@@ -27,7 +27,7 @@ dpwd_SOURCES = dpwd.c dtools.c
 dpwd_LDADD = $(GIO_LIBS)
 dresolve_SOURCES = dresolve.c dtools.c
 dresolve_LDADD = $(GIO_LIBS)
-decho_SOURCES = decho.c variant-writer.c
+decho_SOURCES = decho.c variant-writer.c pipeneg.c
 decho_LDADD = $(GIO_LIBS)
 
 ChangeLog:

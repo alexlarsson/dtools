@@ -68,7 +68,7 @@ pipe_negotiate_format (int fd)
   /* Early check to avoid unecessary wait for non-pipes
      or if the lock is already set. */
   format = check_format (fd);
-  
+
   if (format == -1) {
     /* Wait until byte is consumed, we then know the lock status is up-to-date */
 

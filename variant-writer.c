@@ -22,11 +22,13 @@
 #include <errno.h>
 #include <gio/gio.h>
 
+#include "pipeneg.h"
 #include "variant-writer.h"
 
 struct DtoolsVariantWriter
 {
   GObject parent_instance;
+  int stream_format;
   int fd;
 };
   
@@ -35,6 +37,7 @@ G_DEFINE_TYPE (DtoolsVariantWriter, dtools_variant_writer, G_TYPE_OBJECT)
 static void
 dtools_variant_writer_init (DtoolsVariantWriter *self)
 {
+  self->stream_format = -1;
 }
 
 static void
@@ -48,37 +51,34 @@ dtools_variant_writer_class_init (DtoolsVariantWriterClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize     = dtools_variant_writer_finalize;
+  object_class->finalize = dtools_variant_writer_finalize;
 }
 
 DtoolsVariantWriter *
 dtools_variant_writer_new (int fd)
 {
-  return g_object_new (DTOOLS_TYPE_VARIANT_WRITER, NULL);
+  DtoolsVariantWriter *writer;
+
+  writer = g_object_new (DTOOLS_TYPE_VARIANT_WRITER, NULL);
+  writer->fd = fd;
+
+  return writer;
 }
 
-void
-dtools_variant_writer_add (DtoolsVariantWriter *writer,
-			   GVariant *value)
+static void
+write_all (DtoolsVariantWriter *writer,
+	   const char *data, gsize len)
 {
-  char *str;
-  size_t len, written;
-  ssize_t res;
-  GVariant *variant;
-
-  variant = g_variant_new_variant (value);
-  str = g_variant_print (variant, FALSE);
-  g_variant_unref (variant);
+  gsize written;
+  gssize res;
   
-  len = strlen (str);
-
   written = 0;
   while (len > written)
     {
       do
-	res = write (writer->fd, str + written, len - written);
+	res = write (writer->fd, data + written, len - written);
       while (res < 0 && errno == EINTR);
-	
+
       if (res <= 0)
 	{
 	  g_warning ("Error writing variant\n");
@@ -87,10 +87,64 @@ dtools_variant_writer_add (DtoolsVariantWriter *writer,
       else
 	written += res;
     }
+}
 
-  do
-    res = write (writer->fd, "\n", 1);
-  while (res < 0 && errno == EINTR);
+void
+dtools_variant_writer_add (DtoolsVariantWriter *writer,
+			   GVariant *value)
+{
+  char *str, *orig_str;
+  gsize len;
+  GVariant *variant;
+  gboolean was_first;
+
+  variant = g_variant_new_variant (value);
+
+  was_first = FALSE;
+  if (writer->stream_format == -1)
+    {
+      writer->stream_format = pipe_negotiate_format (writer->fd);
+      was_first = TRUE;
+    }
+
+  if (writer->stream_format == FORMAT_TEXT)
+    {
+      orig_str = str = g_variant_print (variant, FALSE);
+
+      if (was_first)
+	str++;
   
-  g_free (str);
+      len = strlen (str);
+
+      write_all (writer, str, len);
+      write_all (writer, "\n", 1);
+
+      g_free (orig_str);
+    }
+  else
+    {
+      GVariant *normal;
+      const gchar *data;
+      gsize size;
+      guint32 size_le;
+
+      /* Mark this as a binary stream */
+      if (was_first)
+	write_all (writer, "\0", 1);
+
+      normal = g_variant_get_normal_form (variant);
+      size = g_variant_get_size (normal);
+      if (size > G_MAXUINT32)
+	g_error ("Too large variant");
+
+      size_le = GUINT32_TO_LE ((guint32)size);
+      write_all (writer, (char *)&size_le, 4);
+
+      data = g_variant_get_data (normal);
+      write_all (writer, data, size);
+
+      g_variant_unref (normal);
+    }
+
+  g_variant_unref (variant);
 }
