@@ -37,7 +37,6 @@ int
 main (int argc, char *argv[])
 {
   guint n;
-  char *s;
   GError *error;
   GVariant *value;
   DtoolsVariantWriter *writer;
