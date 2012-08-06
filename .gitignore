@@ -34,3 +34,5 @@ dcat.o
 variant-reader.o
 darg.o
 darg
+dcall
+dcall.o
