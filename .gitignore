@@ -32,3 +32,5 @@ dcat
 dcat.c
 dcat.o
 variant-reader.o
+darg.o
+darg

@@ -18,6 +18,7 @@ bin_PROGRAMS =					\
 	dresolve				\
 	decho					\
 	dcat					\
+	darg					\
 	$(NULL)
 
 pipe_reader_SOURCES = pipe-reader.c pipeneg.c
@@ -32,6 +33,8 @@ decho_SOURCES = decho.c variant-writer.c pipeneg.c
 decho_LDADD = $(GIO_LIBS)
 dcat_SOURCES = dcat.c variant-reader.c pipeneg.c
 dcat_LDADD = $(GIO_LIBS)
+darg_SOURCES = darg.c variant-reader.c pipeneg.c
+darg_LDADD = $(GIO_LIBS)
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
