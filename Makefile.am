@@ -19,6 +19,7 @@ bin_PROGRAMS =					\
 	decho					\
 	dcat					\
 	darg					\
+	dcall					\
 	$(NULL)
 
 pipe_reader_SOURCES = pipe-reader.c pipeneg.c
@@ -31,6 +32,8 @@ dresolve_SOURCES = dresolve.c dtools.c
 dresolve_LDADD = $(GIO_LIBS)
 decho_SOURCES = decho.c variant-writer.c pipeneg.c
 decho_LDADD = $(GIO_LIBS)
+dcall_SOURCES = dcall.c variant-writer.c pipeneg.c dtools.c
+dcall_LDADD = $(GIO_LIBS)
 dcat_SOURCES = dcat.c variant-reader.c pipeneg.c
 dcat_LDADD = $(GIO_LIBS)
 darg_SOURCES = darg.c variant-reader.c pipeneg.c
