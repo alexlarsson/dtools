@@ -12,7 +12,7 @@ escape_unicode (const gchar *str)
 
   g_return_val_if_fail (str != NULL, NULL);
   
-  dest = g_string_new ("'");
+  dest = g_string_new ("");
 
   p = str;
 
@@ -30,9 +30,6 @@ escape_unicode (const gchar *str)
 
       p = g_utf8_next_char (p);
     }
-
-  /* close the quote */
-  g_string_append_c (dest, '\'');
   
   return g_string_free (dest, FALSE);
 }
