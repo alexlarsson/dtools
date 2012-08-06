@@ -190,7 +190,10 @@ dtools_path_disassemble (const char *path,
 	  if (last != NULL && strchr (last, '.') != NULL)
 	    {
 	      *interface = g_strdup (last + 1);
-	      *objpath = g_strndup (rest, last - rest);
+	      if (last == rest)
+		*objpath = g_strdup ("/");
+	      else
+		*objpath = g_strndup (rest, last - rest);
 	    }
 	  else
 	    *objpath = g_strdup (rest);
