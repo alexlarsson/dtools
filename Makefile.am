@@ -22,6 +22,7 @@ bin_PROGRAMS =					\
 	dcall					\
 	dps					\
 	dsort					\
+	dfilter					\
 	dhead					\
 	$(NULL)
 
@@ -45,6 +46,8 @@ dps_SOURCES = dps.c variant-writer.c pipeneg.c
 dps_LDADD = $(GIO_LIBS) -lproc -lm
 dsort_SOURCES = dsort.c variant-writer.c variant-reader.c dtools.c pipeneg.c
 dsort_LDADD = $(GIO_LIBS) -lm
+dfilter_SOURCES = dfilter.c variant-writer.c variant-reader.c dtools.c pipeneg.c
+dfilter_LDADD = $(GIO_LIBS) -lm
 dhead_SOURCES = dhead.c variant-writer.c variant-reader.c dtools.c pipeneg.c
 dhead_LDADD = $(GIO_LIBS) -lm
 
