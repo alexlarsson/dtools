@@ -22,6 +22,7 @@ bin_PROGRAMS =					\
 	dcall					\
 	dps					\
 	dsort					\
+	dhead					\
 	$(NULL)
 
 pipe_reader_SOURCES = pipe-reader.c pipeneg.c
@@ -44,6 +45,8 @@ dps_SOURCES = dps.c variant-writer.c pipeneg.c
 dps_LDADD = $(GIO_LIBS) -lproc -lm
 dsort_SOURCES = dsort.c variant-writer.c variant-reader.c dtools.c pipeneg.c
 dsort_LDADD = $(GIO_LIBS) -lm
+dhead_SOURCES = dhead.c variant-writer.c variant-reader.c dtools.c pipeneg.c
+dhead_LDADD = $(GIO_LIBS) -lm
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
