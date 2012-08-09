@@ -23,6 +23,7 @@ bin_PROGRAMS =					\
 	dps					\
 	dsort					\
 	dfilter					\
+	dtable					\
 	dhead					\
 	$(NULL)
 
@@ -50,6 +51,8 @@ dfilter_SOURCES = dfilter.c variant-writer.c variant-reader.c dtools.c pipeneg.c
 dfilter_LDADD = $(GIO_LIBS) -lm
 dhead_SOURCES = dhead.c variant-writer.c variant-reader.c dtools.c pipeneg.c
 dhead_LDADD = $(GIO_LIBS) -lm
+dtable_SOURCES = dtable.c variant-writer.c variant-reader.c dtools.c pipeneg.c
+dtable_LDADD = $(GIO_LIBS) -lm
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
