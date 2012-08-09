@@ -34,6 +34,12 @@ main (int argc, char *argv[])
       value = g_variant_new_uint32 (proc_info->ppid); 
       g_variant_builder_add(&builder, "{sv}", "ppid", value);
 
+      value = g_variant_new_uint32 (proc_info->euid);
+      g_variant_builder_add(&builder, "{sv}", "euid", value);
+
+      value = g_variant_new_uint32 (proc_info->egid);
+      g_variant_builder_add(&builder, "{sv}", "egid", value);
+
       value = g_variant_new_string (proc_info->euser); 
       g_variant_builder_add(&builder, "{sv}", "user", value);
 
