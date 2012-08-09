@@ -14,3 +14,5 @@ gboolean dtools_path_disassemble (const char *path,
 				  char **objpath,
 				  char **interface,
 				  GError **error);
+int dtools_compare_variant (GVariant *a,
+			    GVariant *b);

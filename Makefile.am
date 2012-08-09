@@ -21,26 +21,29 @@ bin_PROGRAMS =					\
 	darg					\
 	dcall					\
 	dps					\
+	dsort					\
 	$(NULL)
 
 pipe_reader_SOURCES = pipe-reader.c pipeneg.c
 pipe_writer_SOURCES = pipe-writer.c pipeneg.c
 dls_SOURCES = dls.c dtools.c
-dls_LDADD = $(GIO_LIBS)
+dls_LDADD = $(GIO_LIBS) -lm
 dpwd_SOURCES = dpwd.c dtools.c
-dpwd_LDADD = $(GIO_LIBS)
+dpwd_LDADD = $(GIO_LIBS) -lm
 dresolve_SOURCES = dresolve.c dtools.c
-dresolve_LDADD = $(GIO_LIBS)
+dresolve_LDADD = $(GIO_LIBS) -lm
 decho_SOURCES = decho.c variant-writer.c pipeneg.c
-decho_LDADD = $(GIO_LIBS)
+decho_LDADD = $(GIO_LIBS) -lm
 dcall_SOURCES = dcall.c variant-writer.c pipeneg.c dtools.c
-dcall_LDADD = $(GIO_LIBS)
+dcall_LDADD = $(GIO_LIBS) -lm
 dcat_SOURCES = dcat.c variant-reader.c pipeneg.c
-dcat_LDADD = $(GIO_LIBS)
+dcat_LDADD = $(GIO_LIBS) -lm
 darg_SOURCES = darg.c variant-reader.c pipeneg.c
-darg_LDADD = $(GIO_LIBS)
+darg_LDADD = $(GIO_LIBS) -lm
 dps_SOURCES = dps.c variant-writer.c pipeneg.c
-dps_LDADD = $(GIO_LIBS) -lproc
+dps_LDADD = $(GIO_LIBS) -lproc -lm
+dsort_SOURCES = dsort.c variant-writer.c variant-reader.c dtools.c pipeneg.c
+dsort_LDADD = $(GIO_LIBS) -lm
 
 ChangeLog:
 	$(AM_V_GEN) if test -d "$(srcdir)/.git"; then \
